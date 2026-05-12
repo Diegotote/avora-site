@@ -64,7 +64,7 @@ export default function Navigation({
             ? 'bg-[rgba(23,23,23,0.9)] backdrop-blur-xl border-b border-[rgba(200,169,126,0.08)]'
             : 'bg-[rgba(12,12,12,0.62)] backdrop-blur-md'
         }`}
-        style={{ height: '76px' }}
+        style={{ height: '96px' }}
       >
         <div className="container-avora h-full flex items-center justify-between">
           {/* Logo oficial: al hacer clic regresa a la experiencia inicial */}

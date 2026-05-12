@@ -356,6 +356,38 @@
 .avora-logo-img { filter: drop-shadow(0 0 18px rgba(200,169,126,.22)); }
 @keyframes avora-logo-shine { to { transform: translateX(118%) skewX(-16deg); } }
 
+/* Premium scroll distortion: subtle while moving, calm when reading */
+main h1,
+main h2,
+main h3,
+main .font-display {
+  transform-origin: 50% 62%;
+  transition:
+    rotate .26s ease,
+    scale .26s ease,
+    letter-spacing .26s ease,
+    text-shadow .26s ease,
+    filter .26s ease;
+  will-change: rotate, scale, filter;
+}
+
+body.scroll-kinetic-active main h1,
+body.scroll-kinetic-active main h2,
+body.scroll-kinetic-active main h3,
+body.scroll-kinetic-active main .font-display {
+  rotate: var(--scroll-tilt, 0deg);
+  scale: var(--scroll-scale-x, 1) var(--scroll-scale-y, 1);
+  letter-spacing: var(--scroll-wide, 0px);
+  filter: blur(var(--scroll-blur, 0px));
+  text-shadow:
+    var(--scroll-shadow-a, 0px) 0 22px rgba(200,169,126,.18),
+    var(--scroll-shadow-b, 0px) 0 20px rgba(255,255,255,.055);
+}
+
+body.scroll-kinetic-active main section {
+  transition: filter .28s ease, scale .28s ease;
+}
+
 .diagonal-ray {
   position: absolute;
   width: 2px;

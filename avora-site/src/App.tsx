@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import IntroScreen from './sections/IntroScreen';
@@ -12,6 +12,7 @@ import DiagnosticoPage from './sections/DiagnosticoPage';
 import FaqPage from './sections/FaqPage';
 import Footer from './components/Footer';
 import BackgroundEffects from './components/BackgroundEffects';
+import ScrollKinetics from './components/ScrollKinetics';
 import { useAutoTranslate, type Language } from './lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -47,6 +48,28 @@ function App() {
     document.body.scrollTop = 0;
   }, []);
 
+  const hardScrollToTop = useCallback(() => {
+    scrollToTop('auto');
+    const timings = [0, 16, 48, 100, 180, 320];
+    timings.forEach((delay) => {
+      window.setTimeout(() => scrollToTop('auto'), delay);
+    });
+    window.requestAnimationFrame(() => {
+      scrollToTop('auto');
+      window.requestAnimationFrame(() => scrollToTop('auto'));
+    });
+  }, [scrollToTop]);
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    if (phase === 'main') hardScrollToTop();
+  }, [activeSection, phase, hardScrollToTop]);
+
   // Initial intro animation
   useEffect(() => {
     if (phase === 'intro') {
@@ -72,13 +95,13 @@ function App() {
       setPhase('main');
       setShowContent(true);
       setIsTransitioning(false);
-      scrollToTop('auto');
+      hardScrollToTop();
       // Initialize scroll reveals after content mounts
       setTimeout(() => {
         ScrollTrigger.refresh();
       }, 100);
     }, 800);
-  }, [scrollToTop]);
+  }, [hardScrollToTop]);
 
   const handleLogoClick = useCallback(() => {
     setIsTransitioning(true);
@@ -87,28 +110,28 @@ function App() {
       setActiveSection('inicio');
       setShowContent(false);
       setIsTransitioning(false);
-      scrollToTop('auto');
+      hardScrollToTop();
     }, 400);
-  }, [scrollToTop]);
+  }, [hardScrollToTop]);
 
   const handleNavClick = useCallback((section: MainSection) => {
     if (section === activeSection) {
-      scrollToTop('smooth');
+      hardScrollToTop();
       setMobileMenuOpen(false);
       return;
     }
     setIsTransitioning(true);
-    scrollToTop('auto');
+    hardScrollToTop();
     setTimeout(() => {
       setActiveSection(section);
-      scrollToTop('auto');
+      hardScrollToTop();
       setIsTransitioning(false);
       setMobileMenuOpen(false);
       setTimeout(() => {
         ScrollTrigger.refresh();
       }, 100);
     }, 400);
-  }, [activeSection, scrollToTop]);
+  }, [activeSection, hardScrollToTop]);
 
   const scrollToSection = useCallback((section: MainSection) => {
     handleNavClick(section);
@@ -116,18 +139,19 @@ function App() {
 
   const requestDiagnostic = useCallback((membership?: string) => {
     if (membership) setSelectedMembershipForForm(membership);
-    scrollToTop('auto');
+    hardScrollToTop();
     setActiveSection('diagnostico');
     setMobileMenuOpen(false);
     window.setTimeout(() => {
-      scrollToTop('auto');
+      hardScrollToTop();
     }, 50);
-  }, [scrollToTop]);
+  }, [hardScrollToTop]);
 
   return (
     <div className="relative min-h-screen bg-avora-base">
       {/* Background Effects - only on main site */}
       {phase === 'main' && <BackgroundEffects />}
+      {phase === 'main' && <ScrollKinetics />}
 
       {/* Intro Screen */}
       {phase === 'intro' && (

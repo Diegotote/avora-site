@@ -6,8 +6,8 @@ interface LogoProps {
 
 export default function Logo({ className = '', size = 'medium', showText = false }: LogoProps) {
   const sizes = {
-    nav: 'h-11 md:h-14 lg:h-16 w-auto',
-    footer: 'h-14 md:h-20 w-auto',
+    nav: 'h-14 md:h-20 lg:h-24 w-auto',
+    footer: 'h-20 md:h-28 lg:h-32 w-auto',
     small: 'h-10 md:h-12 w-auto',
     medium: 'h-14 md:h-16 w-auto',
     large: 'h-28 md:h-40 w-auto',
