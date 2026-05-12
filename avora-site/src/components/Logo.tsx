@@ -1,15 +1,17 @@
 interface LogoProps {
   className?: string;
-  size?: 'small' | 'medium' | 'large' | 'hero';
+  size?: 'nav' | 'footer' | 'small' | 'medium' | 'large' | 'hero';
   showText?: boolean;
 }
 
 export default function Logo({ className = '', size = 'medium', showText = false }: LogoProps) {
   const sizes = {
-    small: 'h-8 w-auto',
-    medium: 'h-12 w-auto',
-    large: 'h-24 md:h-32 w-auto',
-    hero: 'h-36 md:h-52 lg:h-64 w-auto',
+    nav: 'h-11 md:h-14 lg:h-16 w-auto',
+    footer: 'h-14 md:h-20 w-auto',
+    small: 'h-10 md:h-12 w-auto',
+    medium: 'h-14 md:h-16 w-auto',
+    large: 'h-28 md:h-40 w-auto',
+    hero: 'h-40 md:h-56 lg:h-72 w-auto',
   };
 
   return (

@@ -25,15 +25,21 @@ export function useScrollReveal<T extends HTMLElement>(options: ScrollRevealOpti
 
     targets.forEach((target, index) => {
       target.style.opacity = '0';
-      target.style.transform = `translateY(${options.y ?? 22}px) scale(.985)`;
-      target.style.transition = `opacity ${options.duration ?? 0.55}s ease, transform ${options.duration ?? 0.55}s ease`;
+      target.style.transform = `translateY(${options.y ?? 38}px) scale(.94)`;
+      target.style.filter = 'blur(8px)';
+      target.style.transition = `opacity ${options.duration ?? 0.72}s cubic-bezier(.16,1,.3,1), transform ${options.duration ?? 0.72}s cubic-bezier(.16,1,.3,1), filter ${options.duration ?? 0.72}s cubic-bezier(.16,1,.3,1)`;
       target.style.transitionDelay = `${(options.delay ?? 0) + (options.stagger ?? 0) * index}s`;
+      target.style.willChange = 'opacity, transform, filter';
     });
 
     const reveal = () => {
       targets.forEach((target) => {
         target.style.opacity = '1';
         target.style.transform = 'translateY(0) scale(1)';
+        target.style.filter = 'blur(0)';
+        window.setTimeout(() => {
+          target.style.willChange = 'auto';
+        }, 900);
       });
     };
 

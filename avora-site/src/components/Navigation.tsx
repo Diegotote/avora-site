@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 
 type MainSection = 'inicio' | 'metodologia' | 'servicios' | 'membresias' | 'diagnostico' | 'faq';
+type Language = 'es' | 'en';
 
 interface NavigationProps {
   activeSection: MainSection;
@@ -11,16 +12,28 @@ interface NavigationProps {
   scrollToSection: (section: MainSection) => void;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
 }
 
-const navItems: { label: string; value: MainSection }[] = [
-  { label: 'Inicio', value: 'inicio' },
-  { label: 'Metodología', value: 'metodologia' },
-  { label: 'Servicios', value: 'servicios' },
-  { label: 'Membresías', value: 'membresias' },
-  { label: 'FAQ', value: 'faq' },
-  { label: 'Diagnóstico', value: 'diagnostico' },
-];
+const navLabels: Record<Language, { label: string; value: MainSection }[]> = {
+  es: [
+    { label: 'Inicio', value: 'inicio' },
+    { label: 'Metodología', value: 'metodologia' },
+    { label: 'Servicios', value: 'servicios' },
+    { label: 'Membresías', value: 'membresias' },
+    { label: 'FAQ', value: 'faq' },
+    { label: 'Diagnóstico', value: 'diagnostico' },
+  ],
+  en: [
+    { label: 'Home', value: 'inicio' },
+    { label: 'Methodology', value: 'metodologia' },
+    { label: 'Services', value: 'servicios' },
+    { label: 'Memberships', value: 'membresias' },
+    { label: 'FAQ', value: 'faq' },
+    { label: 'Diagnostic', value: 'diagnostico' },
+  ],
+};
 
 export default function Navigation({
   activeSection,
@@ -29,8 +42,11 @@ export default function Navigation({
   scrollToSection,
   mobileMenuOpen,
   setMobileMenuOpen,
+  language,
+  setLanguage,
 }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
+  const navItems = navLabels[language];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,10 +61,10 @@ export default function Navigation({
       <header
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-[rgba(23,23,23,0.85)] backdrop-blur-xl border-b border-[rgba(200,169,126,0.08)]'
-            : 'bg-transparent'
+            ? 'bg-[rgba(23,23,23,0.9)] backdrop-blur-xl border-b border-[rgba(200,169,126,0.08)]'
+            : 'bg-[rgba(12,12,12,0.62)] backdrop-blur-md'
         }`}
-        style={{ height: '64px' }}
+        style={{ height: '76px' }}
       >
         <div className="container-avora h-full flex items-center justify-between">
           {/* Logo oficial: al hacer clic regresa a la experiencia inicial */}
@@ -57,7 +73,7 @@ export default function Navigation({
             className="group cursor-pointer flex items-center"
             aria-label="Regresar al inicio AVORA"
           >
-            <Logo size="small" className="transition-transform duration-300 group-hover:scale-[1.03]" />
+            <Logo size="nav" className="transition-transform duration-300 group-hover:scale-[1.03]" />
           </button>
 
           {/* Desktop Navigation */}
@@ -83,18 +99,32 @@ export default function Navigation({
           {/* Right Side */}
           <div className="flex items-center gap-4">
             {/* Language Selector - placeholder */}
-            <span className="hidden sm:block font-body text-xs font-medium text-avora-text-muted">
-              <span className="text-avora-gold">ES</span>
-              <span className="mx-1">/</span>
-              <span className="hover:text-avora-gold cursor-pointer transition-colors">EN</span>
-            </span>
+            <div className="hidden sm:flex items-center gap-1 font-body text-xs font-medium text-avora-text-muted">
+              <button
+                type="button"
+                onClick={() => setLanguage('es')}
+                className={`transition-colors ${language === 'es' ? 'text-avora-gold' : 'hover:text-avora-gold'}`}
+                aria-pressed={language === 'es'}
+              >
+                ES
+              </button>
+              <span>/</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`transition-colors ${language === 'en' ? 'text-avora-gold' : 'hover:text-avora-gold'}`}
+                aria-pressed={language === 'en'}
+              >
+                EN
+              </button>
+            </div>
 
             {/* CTA Button */}
             <button
               onClick={() => scrollToSection('diagnostico')}
               className="hidden md:inline-flex btn-primary text-xs py-2 px-4 shimmer"
             >
-              Solicitar diagnóstico
+              {language === 'es' ? 'Solicitar diagnóstico' : 'Request diagnostic'}
             </button>
 
             {/* Mobile Menu Button */}
@@ -136,8 +166,25 @@ export default function Navigation({
               }}
               className="btn-primary mt-4 w-full justify-center"
             >
-              Solicitar diagnóstico
+              {language === 'es' ? 'Solicitar diagnóstico' : 'Request diagnostic'}
             </button>
+            <div className="mt-5 flex justify-center gap-3 text-sm">
+              <button
+                type="button"
+                onClick={() => setLanguage('es')}
+                className={language === 'es' ? 'text-avora-gold' : 'text-avora-text-secondary'}
+              >
+                ES
+              </button>
+              <span className="text-avora-text-muted">/</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={language === 'en' ? 'text-avora-gold' : 'text-avora-text-secondary'}
+              >
+                EN
+              </button>
+            </div>
           </nav>
         </div>
       )}

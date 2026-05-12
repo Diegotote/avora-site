@@ -4,9 +4,11 @@ import { Zap, Users, Globe, Percent, Smartphone, GraduationCap, Search, Clipboar
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 type MainSection = 'inicio' | 'metodologia' | 'servicios' | 'membresias' | 'diagnostico' | 'faq';
+type Language = 'es' | 'en';
 
 interface InicioPageProps {
   onNavClick: (section: MainSection) => void;
+  language?: Language;
 }
 
 const problemCards = [

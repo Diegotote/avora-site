@@ -12,6 +12,7 @@ import DiagnosticoPage from './sections/DiagnosticoPage';
 import FaqPage from './sections/FaqPage';
 import Footer from './components/Footer';
 import BackgroundEffects from './components/BackgroundEffects';
+import { useAutoTranslate, type Language } from './lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,6 +26,26 @@ function App() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedMembershipForForm, setSelectedMembershipForForm] = useState<string>('');
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const savedLanguage = window.localStorage.getItem('avora-language');
+      if (savedLanguage === 'es' || savedLanguage === 'en') return savedLanguage;
+    }
+    if (typeof navigator === 'undefined') return 'es';
+    return navigator.language?.toLowerCase().startsWith('en') ? 'en' : 'es';
+  });
+
+  useAutoTranslate(language);
+
+  useEffect(() => {
+    window.localStorage.setItem('avora-language', language);
+  }, [language]);
+
+  const scrollToTop = useCallback((behavior: ScrollBehavior = 'auto') => {
+    window.scrollTo({ top: 0, left: 0, behavior });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   // Initial intro animation
   useEffect(() => {
@@ -51,12 +72,13 @@ function App() {
       setPhase('main');
       setShowContent(true);
       setIsTransitioning(false);
+      scrollToTop('auto');
       // Initialize scroll reveals after content mounts
       setTimeout(() => {
         ScrollTrigger.refresh();
       }, 100);
     }, 800);
-  }, []);
+  }, [scrollToTop]);
 
   const handleLogoClick = useCallback(() => {
     setIsTransitioning(true);
@@ -65,23 +87,28 @@ function App() {
       setActiveSection('inicio');
       setShowContent(false);
       setIsTransitioning(false);
-      window.scrollTo(0, 0);
+      scrollToTop('auto');
     }, 400);
-  }, []);
+  }, [scrollToTop]);
 
   const handleNavClick = useCallback((section: MainSection) => {
-    if (section === activeSection) return;
+    if (section === activeSection) {
+      scrollToTop('smooth');
+      setMobileMenuOpen(false);
+      return;
+    }
     setIsTransitioning(true);
+    scrollToTop('auto');
     setTimeout(() => {
       setActiveSection(section);
-      window.scrollTo(0, 0);
+      scrollToTop('auto');
       setIsTransitioning(false);
       setMobileMenuOpen(false);
       setTimeout(() => {
         ScrollTrigger.refresh();
       }, 100);
     }, 400);
-  }, [activeSection]);
+  }, [activeSection, scrollToTop]);
 
   const scrollToSection = useCallback((section: MainSection) => {
     handleNavClick(section);
@@ -89,12 +116,13 @@ function App() {
 
   const requestDiagnostic = useCallback((membership?: string) => {
     if (membership) setSelectedMembershipForForm(membership);
+    scrollToTop('auto');
     setActiveSection('diagnostico');
     setMobileMenuOpen(false);
     window.setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToTop('auto');
     }, 50);
-  }, []);
+  }, [scrollToTop]);
 
   return (
     <div className="relative min-h-screen bg-avora-base">
@@ -127,6 +155,8 @@ function App() {
             scrollToSection={scrollToSection}
             mobileMenuOpen={mobileMenuOpen}
             setMobileMenuOpen={setMobileMenuOpen}
+            language={language}
+            setLanguage={setLanguage}
           />
 
           <main
@@ -134,7 +164,7 @@ function App() {
           >
             {showContent && (
               <>
-                {activeSection === 'inicio' && <InicioPage onNavClick={handleNavClick} />}
+                {activeSection === 'inicio' && <InicioPage onNavClick={handleNavClick} language={language} />}
                 {activeSection === 'metodologia' && <MetodologiaPage />}
                 {activeSection === 'servicios' && <ServiciosPage onNavClick={handleNavClick} />}
                 {activeSection === 'membresias' && <MembresiasPage onRequestDiagnostic={requestDiagnostic} />}

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Crown, X, Check } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
@@ -116,6 +117,15 @@ export default function MembresiasPage({ onRequestDiagnostic }: { onRequestDiagn
   const insightRef = useScrollReveal<HTMLDivElement>({ threshold: 0.85 });
   const baseRef = useScrollReveal<HTMLDivElement>({ stagger: 0.15, threshold: 0.8 });
   const comboRef = useScrollReveal<HTMLDivElement>({ stagger: 0.15, threshold: 0.8 });
+
+  useEffect(() => {
+    if (!selectedMembership) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [selectedMembership]);
 
   return (
     <div className="relative z-10 pt-24">
@@ -322,7 +332,7 @@ export default function MembresiasPage({ onRequestDiagnostic }: { onRequestDiagn
       </section>
 
       {/* Membership Modal */}
-      {selectedMembership && (
+      {selectedMembership && createPortal(
         <div
           className="fixed inset-0 z-[200] modal-center-shell"
           onClick={() => setSelectedMembership(null)}
@@ -335,7 +345,7 @@ export default function MembresiasPage({ onRequestDiagnostic }: { onRequestDiagn
 
           {/* Modal */}
           <div
-            className="relative modal-panel-fixed modal-scroll rounded-2xl"
+            className={`relative modal-panel-fixed modal-scroll rounded-2xl ${selectedMembership.isElite ? 'modal-panel-elite' : ''}`}
             style={{
               background: '#171717',
               border: '1px solid rgba(200, 169, 126, 0.3)',
@@ -445,7 +455,8 @@ export default function MembresiasPage({ onRequestDiagnostic }: { onRequestDiagn
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <style>{`
