@@ -358,11 +358,17 @@
 
 /* Edge-only premium scroll: content fades/zooms only while leaving the viewport. */
 .edge-scroll-item {
-  opacity: calc(1 - (var(--edge-fade, 0) * .82));
-  transform: translateY(calc(var(--edge-fade, 0) * -10px)) scale(calc(1 + (var(--edge-fade, 0) * .045)));
-  filter: blur(calc(var(--edge-fade, 0) * 5px));
+  opacity: calc(1 - (var(--edge-fade, 0) * .55));
+  transform: translateY(calc(var(--edge-fade, 0) * -7px)) scale(calc(1 + (var(--edge-fade, 0) * .028)));
+  filter: blur(calc(var(--edge-fade, 0) * 3px));
   transition: opacity .16s linear, transform .16s linear, filter .16s linear;
   will-change: opacity, transform, filter;
+}
+
+#diagnostico,
+#diagnostico * {
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .diagonal-ray {

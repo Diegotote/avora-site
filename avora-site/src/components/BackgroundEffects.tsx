@@ -10,7 +10,8 @@ export default function BackgroundEffects() {
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.innerWidth < 768;
-    const particleCount = prefersReduced ? 160 : isMobile ? 520 : 1250;
+    const isApple = /Mac|iPhone|iPad|iPod/i.test(navigator.platform) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const particleCount = prefersReduced ? 120 : isApple ? (isMobile ? 220 : 520) : isMobile ? 420 : 1050;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -18,7 +19,7 @@ export default function BackgroundEffects() {
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isApple ? 1.05 : 1.45));
 
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -71,7 +72,7 @@ export default function BackgroundEffects() {
       const delta = nextY - scroll.y;
       scroll.y = nextY;
       scroll.direction = delta >= 0 ? 1 : -1;
-      scroll.velocity = Math.min(Math.abs(delta) / 42, 1);
+      scroll.velocity = Math.min(Math.abs(delta) / (isApple ? 72 : 48), 1);
       scroll.boost = Math.max(scroll.boost, scroll.velocity);
       document.documentElement.style.setProperty('--particle-warp', scroll.boost.toFixed(3));
     };
@@ -89,15 +90,15 @@ export default function BackgroundEffects() {
 
       smooth.x += (mouse.x - smooth.x) * 0.035;
       smooth.y += (mouse.y - smooth.y) * 0.035;
-      scroll.boost += (0 - scroll.boost) * 0.035;
+      scroll.boost += (0 - scroll.boost) * (isApple ? 0.07 : 0.045);
 
       const pos = geometry.attributes.position.array as Float32Array;
-      const warpSpeed = 1 + scroll.boost * (isMobile ? 12 : 22);
-      const zRush = scroll.boost * 0.036 * scroll.direction;
+      const warpSpeed = 1 + scroll.boost * (isApple ? (isMobile ? 4 : 7) : isMobile ? 9 : 16);
+      const zRush = scroll.boost * (isApple ? 0.012 : 0.026) * scroll.direction;
       for (let i = 0; i < particleCount; i++) {
         pos[i * 3 + 1] += velocities[i] * warpSpeed * scroll.direction;
         pos[i * 3 + 2] += zRush;
-        pos[i * 3] += Math.sin(frame * 0.004 + i) * (0.00045 + scroll.boost * 0.002);
+        pos[i * 3] += Math.sin(frame * 0.004 + i) * (0.00045 + scroll.boost * (isApple ? 0.0006 : 0.0014));
         if (pos[i * 3 + 1] > 3.25) pos[i * 3 + 1] = -3.25;
         if (pos[i * 3 + 1] < -3.25) pos[i * 3 + 1] = 3.25;
         if (pos[i * 3 + 2] > 2.35) pos[i * 3 + 2] = -2.35;
@@ -107,8 +108,8 @@ export default function BackgroundEffects() {
 
       particles.rotation.y = smooth.x * 0.12;
       particles.rotation.x = smooth.y * 0.07;
-      material.opacity = 0.72 + scroll.boost * 0.18;
-      material.size = (isMobile ? 0.012 : 0.014) + scroll.boost * 0.011;
+      material.opacity = 0.62 + scroll.boost * (isApple ? 0.08 : 0.14);
+      material.size = (isMobile ? 0.011 : 0.013) + scroll.boost * (isApple ? 0.003 : 0.008);
       renderer.render(scene, camera);
     };
 

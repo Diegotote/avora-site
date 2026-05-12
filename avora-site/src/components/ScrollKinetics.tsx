@@ -14,10 +14,11 @@ export default function ScrollKinetics() {
     const updateEdgeFade = () => {
       ticking = false;
       const viewport = window.innerHeight || 1;
-      const topZone = viewport * 0.18;
-      const bottomZone = viewport * 0.18;
+      const topZone = viewport * 0.1;
+      const bottomZone = viewport * 0.1;
 
-      document.querySelectorAll<HTMLElement>('main h1, main h2, main h3, main .glass-card, main .label-avora').forEach((element) => {
+      document.querySelectorAll<HTMLElement>('main h1, main h2, main h3').forEach((element) => {
+        if (element.closest('#diagnostico, form, .no-edge-fade')) return;
         const rect = element.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
         const topForce = clamp((topZone - center) / topZone, 0, 1);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 type FormData = {
@@ -53,6 +54,7 @@ export default function DiagnosticoPage({ selectedMembership = '' }: { selectedM
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [openSelect, setOpenSelect] = useState<keyof FormData | null>(null);
 
   useEffect(() => {
     if (selectedMembership) {
@@ -62,8 +64,13 @@ export default function DiagnosticoPage({ selectedMembership = '' }: { selectedM
     }
   }, [selectedMembership]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSelect = (name: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setOpenSelect(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,8 +104,76 @@ export default function DiagnosticoPage({ selectedMembership = '' }: { selectedM
   const inputClass =
     'w-full bg-[rgba(10,10,10,0.6)] border border-[rgba(200,169,126,0.2)] rounded px-4 py-3 font-body text-[15px] text-avora-text-primary placeholder:text-avora-text-muted focus:border-[rgba(200,169,126,0.6)] focus:outline-none focus:ring-[3px] focus:ring-[rgba(200,169,126,0.1)] transition-all duration-200';
 
+  const SelectField = ({
+    name,
+    options,
+    placeholder = 'Selecciona...',
+  }: {
+    name: keyof FormData;
+    options: string[];
+    placeholder?: string;
+  }) => {
+    const isOpen = openSelect === name;
+    const value = formData[name];
+
+    return (
+      <div
+        className="relative"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setOpenSelect(null);
+          }
+        }}
+      >
+        <button
+          type="button"
+          className={`${inputClass} flex items-center justify-between text-left`}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          onClick={() => setOpenSelect(isOpen ? null : name)}
+        >
+          <span className={value ? 'text-avora-text-primary' : 'text-avora-text-muted'}>
+            {value || placeholder}
+          </span>
+          <ChevronDown className={`h-4 w-4 text-avora-gold transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isOpen && (
+          <div
+            className="absolute left-0 right-0 top-[calc(100%+6px)] z-[80] max-h-60 overflow-auto rounded border border-[rgba(200,169,126,0.34)] bg-[#121212] p-1 shadow-[0_18px_50px_rgba(0,0,0,.65)]"
+            role="listbox"
+          >
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded px-3 py-2 text-left font-body text-sm text-avora-text-muted hover:bg-[rgba(200,169,126,0.1)]"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => handleSelect(name, '')}
+            >
+              {placeholder}
+              {!value && <Check className="h-4 w-4 text-avora-gold" />}
+            </button>
+            {options.map((option) => (
+              <button
+                key={option}
+                type="button"
+                className="flex w-full items-center justify-between rounded px-3 py-2 text-left font-body text-sm text-avora-text-secondary hover:bg-[rgba(200,169,126,0.14)] hover:text-avora-text-primary"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => handleSelect(name, option)}
+                role="option"
+                aria-selected={value === option}
+              >
+                {option}
+                {value === option && <Check className="h-4 w-4 text-avora-gold" />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div id="diagnostico" className="relative z-10 pt-24">
+    <div id="diagnostico" className="no-edge-fade relative z-10 pt-24">
       {/* Header */}
       <section className="py-16 md:py-24">
         <div className="container-avora max-w-3xl text-center">
@@ -132,7 +207,7 @@ export default function DiagnosticoPage({ selectedMembership = '' }: { selectedM
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="glass-card p-8 md:p-10">
+            <form onSubmit={handleSubmit} className="glass-card no-edge-fade p-8 md:p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nombre */}
                 <div className="md:col-span-2">
@@ -221,49 +296,19 @@ export default function DiagnosticoPage({ selectedMembership = '' }: { selectedM
                 {/* Tipo */}
                 <div>
                   <label className="label-avora mb-1 block text-[11px]">Tipo de hotel</label>
-                  <select
-                    name="tipo"
-                    value={formData.tipo}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="">Selecciona...</option>
-                    {tipoOptions.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
+                  <SelectField name="tipo" options={tipoOptions} />
                 </div>
 
                 {/* Reto */}
                 <div className="md:col-span-2">
                   <label className="label-avora mb-1 block text-[11px]">Principal reto actual</label>
-                  <select
-                    name="reto"
-                    value={formData.reto}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="">Selecciona...</option>
-                    {retoOptions.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
+                  <SelectField name="reto" options={retoOptions} />
                 </div>
 
                 {/* Membresia */}
                 <div className="md:col-span-2">
                   <label className="label-avora mb-1 block text-[11px]">Membresía de interés</label>
-                  <select
-                    name="membresia"
-                    value={formData.membresia}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="">Selecciona...</option>
-                    {membresiaOptions.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
+                  <SelectField name="membresia" options={membresiaOptions} />
                 </div>
 
                 {formData.membresia && (
