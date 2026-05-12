@@ -356,36 +356,13 @@
 .avora-logo-img { filter: drop-shadow(0 0 18px rgba(200,169,126,.22)); }
 @keyframes avora-logo-shine { to { transform: translateX(118%) skewX(-16deg); } }
 
-/* Premium scroll distortion: subtle while moving, calm when reading */
-main h1,
-main h2,
-main h3,
-main .font-display {
-  transform-origin: 50% 62%;
-  transition:
-    rotate .26s ease,
-    scale .26s ease,
-    letter-spacing .26s ease,
-    text-shadow .26s ease,
-    filter .26s ease;
-  will-change: rotate, scale, filter;
-}
-
-body.scroll-kinetic-active main h1,
-body.scroll-kinetic-active main h2,
-body.scroll-kinetic-active main h3,
-body.scroll-kinetic-active main .font-display {
-  rotate: var(--scroll-tilt, 0deg);
-  scale: var(--scroll-scale-x, 1) var(--scroll-scale-y, 1);
-  letter-spacing: var(--scroll-wide, 0px);
-  filter: blur(var(--scroll-blur, 0px));
-  text-shadow:
-    var(--scroll-shadow-a, 0px) 0 22px rgba(200,169,126,.18),
-    var(--scroll-shadow-b, 0px) 0 20px rgba(255,255,255,.055);
-}
-
-body.scroll-kinetic-active main section {
-  transition: filter .28s ease, scale .28s ease;
+/* Edge-only premium scroll: content fades/zooms only while leaving the viewport. */
+.edge-scroll-item {
+  opacity: calc(1 - (var(--edge-fade, 0) * .82));
+  transform: translateY(calc(var(--edge-fade, 0) * -10px)) scale(calc(1 + (var(--edge-fade, 0) * .045)));
+  filter: blur(calc(var(--edge-fade, 0) * 5px));
+  transition: opacity .16s linear, transform .16s linear, filter .16s linear;
+  will-change: opacity, transform, filter;
 }
 
 .diagonal-ray {
@@ -413,6 +390,19 @@ body.scroll-kinetic-active main section {
   z-index: 3;
   background: radial-gradient(circle, rgba(200,169,126,.055), rgba(200,169,126,.018) 36%, transparent 68%);
   mix-blend-mode: screen;
+}
+
+canvas + div::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: calc(var(--particle-warp, 0) * .42);
+  background:
+    radial-gradient(ellipse at center, transparent 0 42%, rgba(212,175,55,.08) 68%, transparent 100%),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(212,175,55,.08) 47px, transparent 49px);
+  filter: blur(1px);
+  transform: scaleY(calc(1 + (var(--particle-warp, 0) * .08)));
+  transition: opacity .18s linear;
 }
 
 .page-zoom-enter { animation: pageZoomEnter .45s cubic-bezier(.16,1,.3,1) both; }
